@@ -1,0 +1,8 @@
+{
+  "name": "GT2-Prism",
+  "description": "A high-performance, WebGL-based audio visualizer designed for LED walls and large displays. Features organic fluid simulations and voxel-based rendering modes.",
+  "requestFramePermissions": [
+    "microphone",
+    "display-capture"
+  ]
+}
