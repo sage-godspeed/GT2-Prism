@@ -1,0 +1,9 @@
+{
+  "name": "gt2-prism",
+  "compatibility_date": "2024-11-28",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "main": "worker.js"
+}
