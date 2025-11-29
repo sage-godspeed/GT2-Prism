@@ -3,11 +3,12 @@ import React, { useEffect, useState, useRef } from 'react';
 interface PerformerOverlayProps {
   messages: string[];
   color: string;
+  fontFamily: string;
 }
 
 type AnimationState = 'hidden' | 'fade-in' | 'steady' | 'rave' | 'fade-out';
 
-export const PerformerOverlay: React.FC<PerformerOverlayProps> = ({ messages, color }) => {
+export const PerformerOverlay: React.FC<PerformerOverlayProps> = ({ messages, color, fontFamily }) => {
   const [animState, setAnimState] = useState<AnimationState>('hidden');
   const [currentMessage, setCurrentMessage] = useState('');
   
@@ -118,8 +119,11 @@ export const PerformerOverlay: React.FC<PerformerOverlayProps> = ({ messages, co
       <style>{styles}</style>
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-20 overflow-hidden mix-blend-screen p-8">
         <h1 
-          className={`font-['Space_Mono'] font-bold text-6xl md:text-8xl lg:text-9xl tracking-widest uppercase text-center select-none whitespace-pre-wrap max-w-[90vw] ${getClassName()}`}
-          style={{ color: animState === 'rave' ? undefined : color }}
+          className={`font-bold text-6xl md:text-8xl lg:text-9xl tracking-widest uppercase text-center select-none whitespace-pre-wrap max-w-[90vw] ${getClassName()}`}
+          style={{ 
+            color: animState === 'rave' ? undefined : color,
+            fontFamily: fontFamily 
+          }}
         >
           {currentMessage}
         </h1>

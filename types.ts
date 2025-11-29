@@ -20,3 +20,26 @@ export interface AudioAnalysisData {
   volume: number; // 0-1 (Smoothed RMS)
   frequencyData: Uint8Array;
 }
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      mesh: any;
+      group: any;
+      instancedMesh: any;
+      primitive: any;
+      points: any;
+      ambientLight: any;
+      pointLight: any;
+      spotLight: any;
+      directionalLight: any;
+      boxGeometry: any;
+      planeGeometry: any;
+      icosahedronGeometry: any;
+      cylinderGeometry: any;
+      meshStandardMaterial: any;
+      shaderMaterial: any;
+      [elemName: string]: any;
+    }
+  }
+}

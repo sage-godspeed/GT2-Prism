@@ -1,9 +1,19 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { AudioManager } from './services/audioManager';
 import { VisualizerScene } from './components/VisualizerScene';
 import { Controls } from './components/Controls';
 import { PerformerOverlay } from './components/PerformerOverlay';
 import { AudioSourceType, VisualMode } from './types';
+
+const FONTS = [
+    '"Space Mono", monospace', 
+    '"Orbitron", sans-serif', 
+    '"Rajdhani", sans-serif', 
+    '"Syncopate", sans-serif', 
+    '"Bungee Outline", cursive',
+    '"Press Start 2P", cursive',
+    '"Inter", sans-serif'
+];
 
 function App() {
   // --- State ---
@@ -26,6 +36,8 @@ function App() {
   // Appearance State
   const [primaryColor, setPrimaryColor] = useState<string>('#00ffff'); // Name Color
   const [secondaryColor, setSecondaryColor] = useState<string>('#8a2be2'); // Visuals Color
+  const [fontFamily, setFontFamily] = useState<string>(FONTS[0]);
+  const [isAutoRandomColor, setIsAutoRandomColor] = useState<boolean>(false);
 
   // Audio Settings
   const [isMonitoring, setIsMonitoring] = useState<boolean>(false);
@@ -70,6 +82,60 @@ function App() {
   }, [isAutoCycle, cycleModes]);
 
   // --- Handlers ---
+  const handleRandomizeAppearance = useCallback(() => {
+    // Helper to generate a hex color from HSL
+    const hslToHex = (h: number, s: number, l: number) => {
+      l /= 100;
+      const a = s * Math.min(l, 1 - l) / 100;
+      const f = (n: number) => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    };
+
+    // 1. Generate a random base Hue (0-360)
+    const baseHue = Math.floor(Math.random() * 360);
+    
+    // 2. Generate a contrasting Hue (180 degrees offset +/- randomness)
+    // This creates a complementary color scheme (e.g. Blue & Orange, Red & Green)
+    const contrastHue = (baseHue + 180 + (Math.random() * 60 - 30)) % 360;
+
+    // 3. Generate Colors
+    // Ensure high saturation (80-100%) and good lightness (50-70%) so they pop against black
+    const s = 80 + Math.random() * 20;
+    const l = 50 + Math.random() * 20;
+
+    const color1 = hslToHex(baseHue, s, l);
+    const color2 = hslToHex(contrastHue, s, l);
+
+    // 4. Randomly assign which is Text vs Visuals
+    if (Math.random() > 0.5) {
+        setPrimaryColor(color1);   // Text
+        setSecondaryColor(color2); // Visuals
+    } else {
+        setPrimaryColor(color2);
+        setSecondaryColor(color1);
+    }
+    
+    // Random Font
+    const randomFont = FONTS[Math.floor(Math.random() * FONTS.length)];
+    setFontFamily(randomFont);
+  }, []);
+
+  // --- Auto Random Appearance Logic ---
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (isAutoRandomColor) {
+        // Run once immediately? No, let the user see the switch happen or wait for interval.
+        // Actually, trigger one immediately if they just turned it on? 
+        // Let's just set the interval.
+        interval = setInterval(handleRandomizeAppearance, 2000); // 2 seconds (Electro tempo friendly)
+    }
+    return () => clearInterval(interval);
+  }, [isAutoRandomColor, handleRandomizeAppearance]);
+
   const handleSourceChange = async (type: AudioSourceType) => {
     try {
         setErrorMsg(null);
@@ -167,7 +233,7 @@ function App() {
       </div>
 
       {/* 2. Overlays */}
-      <PerformerOverlay messages={overlayMessages} color={primaryColor} />
+      <PerformerOverlay messages={overlayMessages} color={primaryColor} fontFamily={fontFamily} />
 
       {/* 3. Error Toast */}
       {errorMsg && (
@@ -243,6 +309,9 @@ function App() {
         setPrimaryColor={setPrimaryColor}
         secondaryColor={secondaryColor}
         setSecondaryColor={setSecondaryColor}
+        onManualRandomize={handleRandomizeAppearance}
+        isAutoRandomColor={isAutoRandomColor}
+        setIsAutoRandomColor={setIsAutoRandomColor}
         isMonitoring={isMonitoring}
         setIsMonitoring={setIsMonitoring}
         isAutoCycle={isAutoCycle}

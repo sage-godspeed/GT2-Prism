@@ -18,6 +18,9 @@ interface ControlsProps {
   setPrimaryColor: (color: string) => void;
   secondaryColor: string;
   setSecondaryColor: (color: string) => void;
+  onManualRandomize: () => void;
+  isAutoRandomColor: boolean;
+  setIsAutoRandomColor: (val: boolean) => void;
   isMonitoring: boolean;
   setIsMonitoring: (val: boolean) => void;
   isAutoCycle: boolean;
@@ -45,6 +48,9 @@ export const Controls: React.FC<ControlsProps> = ({
   setPrimaryColor,
   secondaryColor,
   setSecondaryColor,
+  onManualRandomize,
+  isAutoRandomColor,
+  setIsAutoRandomColor,
   isMonitoring,
   setIsMonitoring,
   isAutoCycle,
@@ -247,32 +253,56 @@ export const Controls: React.FC<ControlsProps> = ({
             </div>
           </div>
 
-          {/* Colors */}
-          <div className="flex gap-2">
-              <div className="flex-1">
-                  <label className="block text-xs text-gray-400 mb-1">NAME COLOR</label>
-                  <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded border border-white/5 hover:border-white/10 transition-colors">
-                      <input 
-                          type="color" 
-                          value={primaryColor}
-                          onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="w-6 h-6 rounded cursor-pointer border-none p-0 bg-transparent"
-                      />
-                      <span className="text-xs font-mono text-gray-300">{primaryColor}</span>
-                  </div>
-              </div>
-              <div className="flex-1">
-                  <label className="block text-xs text-gray-400 mb-1">VISUAL COLOR</label>
-                  <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded border border-white/5 hover:border-white/10 transition-colors">
-                      <input 
-                          type="color" 
-                          value={secondaryColor}
-                          onChange={(e) => setSecondaryColor(e.target.value)}
-                          className="w-6 h-6 rounded cursor-pointer border-none p-0 bg-transparent"
-                      />
-                      <span className="text-xs font-mono text-gray-300">{secondaryColor}</span>
-                  </div>
-              </div>
+          {/* Appearance & Randomizer */}
+          <div>
+            <div className="flex justify-between items-end mb-1">
+                <label className="block text-xs text-gray-400">APPEARANCE</label>
+                <div className="flex items-center gap-2">
+                   <button 
+                    onClick={onManualRandomize}
+                    className="p-1 rounded bg-cyan-900/40 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-800"
+                    title="Randomize Now"
+                   >
+                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                   </button>
+                   <input 
+                      type="checkbox" 
+                      id="autoRandom"
+                      checked={isAutoRandomColor} 
+                      onChange={(e) => setIsAutoRandomColor(e.target.checked)}
+                      className="accent-cyan-500 w-3 h-3"
+                   />
+                   <label htmlFor="autoRandom" className="text-[10px] text-cyan-300 cursor-pointer select-none">
+                      AUTO RANDOM
+                   </label>
+                </div>
+            </div>
+            <div className="flex gap-2">
+                <div className="flex-1">
+                    <label className="block text-[10px] text-gray-500 mb-0.5">TEXT</label>
+                    <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded border border-white/5 hover:border-white/10 transition-colors">
+                        <input 
+                            type="color" 
+                            value={primaryColor}
+                            onChange={(e) => setPrimaryColor(e.target.value)}
+                            className="w-6 h-6 rounded cursor-pointer border-none p-0 bg-transparent"
+                        />
+                        <span className="text-xs font-mono text-gray-300">{primaryColor}</span>
+                    </div>
+                </div>
+                <div className="flex-1">
+                    <label className="block text-[10px] text-gray-500 mb-0.5">VISUALS</label>
+                    <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded border border-white/5 hover:border-white/10 transition-colors">
+                        <input 
+                            type="color" 
+                            value={secondaryColor}
+                            onChange={(e) => setSecondaryColor(e.target.value)}
+                            className="w-6 h-6 rounded cursor-pointer border-none p-0 bg-transparent"
+                        />
+                        <span className="text-xs font-mono text-gray-300">{secondaryColor}</span>
+                    </div>
+                </div>
+            </div>
           </div>
 
           {/* Performer Name */}
