@@ -87,7 +87,7 @@ export const PixelGrid: React.FC<PixelGridProps> = ({ audioData, color }) => {
           tempObject.rotation.x = Math.sin(time + x) * 0.1 + (bass * 0.2);
           tempObject.rotation.z = Math.cos(time + z) * 0.1 + (bass * 0.2);
 
-          const scaleY = 1 + (bass * 2) + (mid * 1);
+          // scaleY removed as it was unused
           tempObject.scale.set(0.9, 0.9, 0.9);
           
           tempObject.updateMatrix();

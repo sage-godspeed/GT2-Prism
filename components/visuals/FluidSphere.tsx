@@ -194,7 +194,7 @@ export const FluidSphere: React.FC<FluidSphereProps> = ({ audioData, color, isHi
     }
   }, [color]);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     const { bass, mid, high } = audioData.current;
 
     if (materialRef.current) {

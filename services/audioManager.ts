@@ -134,7 +134,8 @@ export class AudioManager {
       return { bass: 0, mid: 0, high: 0, volume: 0, frequencyData: new Uint8Array(0) };
     }
 
-    this.analyser.getByteFrequencyData(this.audioDataArray);
+    // Cast to any to bypass the ArrayBufferLike vs ArrayBuffer mismatch in strict environments
+    this.analyser.getByteFrequencyData(this.audioDataArray as any);
 
     const length = this.audioDataArray.length;
     const bassEnd = Math.floor(length * 0.1);

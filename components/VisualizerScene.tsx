@@ -38,7 +38,7 @@ const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sen
       mid: Math.min(rawData.mid * sensitivity, 1),
       high: Math.min(rawData.high * sensitivity, 1),
       volume: Math.min(rawData.volume * sensitivity, 1),
-      frequencyData: rawData.frequencyData
+      frequencyData: rawData.frequencyData as any
     };
   });
 
@@ -68,7 +68,7 @@ const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sen
           <FireRealm audioData={audioDataRef} color={color} />
       )}
 
-      <EffectComposer disableNormalPass>
+      <EffectComposer>
         <Bloom 
             luminanceThreshold={0.2} 
             mipmapBlur 

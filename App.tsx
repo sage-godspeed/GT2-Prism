@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AudioManager } from './services/audioManager';
 import { VisualizerScene } from './components/VisualizerScene';
 import { Controls } from './components/Controls';
