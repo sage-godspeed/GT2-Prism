@@ -83,7 +83,7 @@ export const CasinoRoyale: React.FC<CasinoRoyaleProps> = ({ audioData, color }) 
         diceMatRef.current.emissiveIntensity = 0.2 + (bass * 2.0);
     }
 
-    const updatePhysics = (mesh: THREE.InstancedMesh, data: Float32Array, isChip: boolean) => {
+    const updatePhysics = (mesh: THREE.InstancedMesh, data: Float32Array) => {
         for(let i=0; i<OBJ_COUNT; i++) {
             const idx = i * 12;
 
@@ -163,8 +163,8 @@ export const CasinoRoyale: React.FC<CasinoRoyaleProps> = ({ audioData, color }) 
         mesh.instanceMatrix.needsUpdate = true;
     };
 
-    if (diceMesh.current) updatePhysics(diceMesh.current, physicsData.dice, false);
-    if (chipMesh.current) updatePhysics(chipMesh.current, physicsData.chips, true);
+    if (diceMesh.current) updatePhysics(diceMesh.current, physicsData.dice);
+    if (chipMesh.current) updatePhysics(chipMesh.current, physicsData.chips);
   });
 
   return (

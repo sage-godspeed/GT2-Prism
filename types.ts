@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 export enum AudioSourceType {
   MICROPHONE = 'MICROPHONE',
@@ -39,8 +39,11 @@ declare global {
       planeGeometry: any;
       icosahedronGeometry: any;
       cylinderGeometry: any;
+      sphereGeometry: any;
       meshStandardMaterial: any;
       shaderMaterial: any;
+      pointsMaterial: any;
+      meshBasicMaterial: any;
       [elemName: string]: any;
     }
   }
