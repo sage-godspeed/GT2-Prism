@@ -1,9 +1,10 @@
 import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { AudioAnalysisData } from '../../types';
 
 interface CasinoRoyaleProps {
-  audioData: React.MutableRefObject<{ bass: number; mid: number; high: number }>;
+  audioData: React.MutableRefObject<AudioAnalysisData>;
   color: string;
 }
 

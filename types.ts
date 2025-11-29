@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 export enum AudioSourceType {
   MICROPHONE = 'MICROPHONE',
   SYSTEM_FILE = 'SYSTEM_FILE',

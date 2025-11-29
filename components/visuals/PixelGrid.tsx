@@ -1,9 +1,10 @@
 import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { AudioAnalysisData } from '../../types';
 
 interface PixelGridProps {
-  audioData: React.MutableRefObject<{ frequencyData: Uint8Array; bass: number; mid: number; high: number }>;
+  audioData: React.MutableRefObject<AudioAnalysisData>;
   color: string;
 }
 

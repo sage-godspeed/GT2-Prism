@@ -2,7 +2,7 @@ import React, { useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
 import { AudioManager } from '../services/audioManager';
-import { VisualMode } from '../types';
+import { VisualMode, AudioAnalysisData } from '../types';
 import { FluidSphere } from './visuals/FluidSphere';
 import { PixelGrid } from './visuals/PixelGrid';
 import { AfrocentricPattern } from './visuals/AfrocentricPattern';
@@ -20,7 +20,7 @@ interface VisualizerSceneProps {
 
 // Internal component to handle the frame loop and pass data to visuals via refs
 const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sensitivity: number; color: string; isHighQuality: boolean }> = ({ audioManager, mode, sensitivity, color, isHighQuality }) => {
-  const audioDataRef = useRef({ 
+  const audioDataRef = useRef<AudioAnalysisData>({ 
     bass: 0, 
     mid: 0, 
     high: 0, 
@@ -38,7 +38,7 @@ const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sen
       mid: Math.min(rawData.mid * sensitivity, 1),
       high: Math.min(rawData.high * sensitivity, 1),
       volume: Math.min(rawData.volume * sensitivity, 1),
-      frequencyData: rawData.frequencyData as any
+      frequencyData: rawData.frequencyData
     };
   });
 

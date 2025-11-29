@@ -1,6 +1,7 @@
 import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { AudioAnalysisData } from '../../types';
 
 // Generate a high-res texture with actual code text
 const generateCodeTexture = (): THREE.CanvasTexture => {
@@ -228,7 +229,7 @@ const fragmentShader = `
 `;
 
 interface CodeMatrixProps {
-  audioData: React.MutableRefObject<{ bass: number; mid: number; high: number }>;
+  audioData: React.MutableRefObject<AudioAnalysisData>;
   color: string;
 }
 
