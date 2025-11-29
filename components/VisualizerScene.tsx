@@ -1,5 +1,6 @@
 import React, { useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
 import { AudioManager } from '../services/audioManager';
 import { VisualMode, AudioAnalysisData } from '../types';
@@ -69,7 +70,8 @@ const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sen
           <FireRealm audioData={audioDataRef} color={color} />
       )}
 
-      <EffectComposer disableNormalPass>
+      {/* Conditional post-processing: if High Quality is off, we reduce complexity */}
+      <EffectComposer disableNormalPass={true} multisampling={isHighQuality ? 4 : 0}>
         <Bloom 
             luminanceThreshold={0.2} 
             mipmapBlur 
@@ -85,17 +87,21 @@ const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sen
 
 export const VisualizerScene: React.FC<VisualizerSceneProps> = (props) => {
   return (
-    <div className="w-full h-full bg-black">
+    <div className="w-full h-full bg-black" style={{ width: '100%', height: '100%', backgroundColor: '#000' }}>
       <Canvas
         camera={{ position: [0, 0, 6], fov: 45 }}
         gl={{ 
-          antialias: false, 
-          alpha: false, // Explicitly disable alpha for performance and to prevent transparent black background
-          powerPreference: 'default', // Relaxed from high-performance to prevent crashes on some mobile GPUs
+          antialias: props.isHighQuality, // Disable antialias for performance unless HQ
+          alpha: true, // Enable alpha to allow CSS background to show through if Canvas clears to transparent
+          powerPreference: 'high-performance',
           stencil: false,
-          depth: true
+          depth: true,
+          preserveDrawingBuffer: true // Sometimes helps with black screen on mobile/capture
         }}
         dpr={[1, 2]} 
+        onCreated={({ gl }) => {
+            gl.setClearColor(new THREE.Color('#000000'), 1);
+        }}
       >
         <Suspense fallback={null}>
           <SceneContent {...props} />

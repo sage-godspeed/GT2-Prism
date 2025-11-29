@@ -128,9 +128,6 @@ function App() {
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (isAutoRandomColor) {
-        // Run once immediately? No, let the user see the switch happen or wait for interval.
-        // Actually, trigger one immediately if they just turned it on? 
-        // Let's just set the interval.
         interval = setInterval(handleRandomizeAppearance, 2000); // 2 seconds (Electro tempo friendly)
     }
     return () => clearInterval(interval);
@@ -141,32 +138,25 @@ function App() {
         setErrorMsg(null);
         setSourceType(type);
         
-        // SAFETY: Prevent feedback loops by defaulting defaults intelligently
         let nextMonitorState = false;
 
         if (type === AudioSourceType.SYSTEM_FILE) {
-             // We generally want to hear files we play
              nextMonitorState = true;
         } else if (type === AudioSourceType.MICROPHONE) {
-             // ALWAYS default to OFF for mic to prevent feedback loop
              nextMonitorState = false;
         } else if (type === AudioSourceType.BROWSER_TAB) {
-             // Default off to avoid echo (browser handles playback)
              nextMonitorState = false;
         }
         
         setIsMonitoring(nextMonitorState);
 
-        // For file type, we don't start immediately, we wait for upload in Controls. 
         if (type !== AudioSourceType.SYSTEM_FILE) {
             await audioManager.setSource(type, undefined, nextMonitorState);
         }
         
-        // If we successfully set a source (or selected file mode), we are initialized
         setIsInitialized(true);
 
     } catch (err: any) {
-        // Log as warning to avoid cluttering console with expected errors
         console.warn("Source change interrupted:", err.message);
 
         let msg = "Failed to access audio source.";
@@ -180,9 +170,6 @@ function App() {
         }
 
         setErrorMsg(msg);
-        
-        // If we failed to initialize, we stay in uninitialized state (Splash Screen)
-        // If we were already initialized, we stay initialized but show error toast
     }
   };
 
@@ -197,7 +184,6 @@ function App() {
       }
   };
 
-  // Update audio monitor dynamically when checkbox changes
   useEffect(() => {
     audioManager.setMonitor(isMonitoring);
   }, [isMonitoring, audioManager]);
@@ -219,10 +205,10 @@ function App() {
   }, [audioManager]);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black text-white font-sans">
+    <div className="relative w-full h-screen overflow-hidden bg-black text-white font-sans" style={{ position: 'relative', width: '100%', height: '100vh', backgroundColor: '#000', color: '#fff' }}>
       
       {/* 1. Visualizer Canvas (Background) */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
          <VisualizerScene 
             audioManager={audioManager} 
             mode={visualMode}
@@ -233,23 +219,24 @@ function App() {
       </div>
 
       {/* 2. Overlays */}
-      <PerformerOverlay messages={overlayMessages} color={primaryColor} fontFamily={fontFamily} />
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 20 }}>
+        <PerformerOverlay messages={overlayMessages} color={primaryColor} fontFamily={fontFamily} />
+      </div>
 
       {/* 3. Error Toast */}
       {errorMsg && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[60] bg-red-600/90 text-white px-6 py-3 rounded-lg shadow-xl border border-red-500 backdrop-blur-sm flex items-center gap-3 animate-fade-in-down">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[60] bg-red-600/90 text-white px-6 py-3 rounded-lg shadow-xl border border-red-500 backdrop-blur-sm flex items-center gap-3 animate-fade-in-down" style={{ position: 'absolute', top: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 60 }}>
               <span className="font-medium text-sm">{errorMsg}</span>
               <button onClick={() => setErrorMsg(null)} className="ml-2 hover:bg-white/20 rounded p-1 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  X
               </button>
           </div>
       )}
 
       {/* 4. Start Prompt (If not initialized) */}
       {!isInitialized && (
-        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md">
-            <h1 className="font-['Space_Mono'] text-4xl mb-8 font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.8)' }}>
+            <h1 className="font-['Space_Mono'] text-4xl mb-8 font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500" style={{ fontSize: '2.5rem', marginBottom: '2rem', color: '#00ffff' }}>
                 GT2-PRISM
             </h1>
             
@@ -257,73 +244,69 @@ function App() {
                 <button 
                     onClick={() => handleSourceChange(AudioSourceType.MICROPHONE)}
                     className="group relative px-8 py-4 bg-cyan-900/30 border border-cyan-500/50 hover:bg-cyan-600 hover:border-cyan-400 text-white font-bold text-lg tracking-widest rounded-xl transition-all duration-300 overflow-hidden"
+                    style={{ padding: '1rem 2rem', margin: '0.5rem', border: '1px solid #06b6d4', borderRadius: '0.75rem', backgroundColor: 'rgba(22, 78, 99, 0.5)', cursor: 'pointer', color: 'white' }}
                 >
-                    <span className="relative z-10 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                        MICROPHONE
-                    </span>
+                    MICROPHONE
                 </button>
 
                 <button 
                     onClick={() => handleSourceChange(AudioSourceType.BROWSER_TAB)}
                     className="group relative px-8 py-4 bg-purple-900/30 border border-purple-500/50 hover:bg-purple-600 hover:border-purple-400 text-white font-bold text-lg tracking-widest rounded-xl transition-all duration-300 overflow-hidden"
+                    style={{ padding: '1rem 2rem', margin: '0.5rem', border: '1px solid #a855f7', borderRadius: '0.75rem', backgroundColor: 'rgba(88, 28, 135, 0.5)', cursor: 'pointer', color: 'white' }}
                 >
-                    <span className="relative z-10 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                        SYSTEM AUDIO
-                    </span>
+                    SYSTEM AUDIO
                 </button>
                 
                  <button 
                     onClick={() => handleSourceChange(AudioSourceType.SYSTEM_FILE)}
                     className="group relative px-8 py-4 bg-gray-800/30 border border-gray-500/50 hover:bg-gray-600 hover:border-gray-400 text-white font-bold text-lg tracking-widest rounded-xl transition-all duration-300 overflow-hidden"
+                    style={{ padding: '1rem 2rem', margin: '0.5rem', border: '1px solid #6b7280', borderRadius: '0.75rem', backgroundColor: 'rgba(31, 41, 55, 0.5)', cursor: 'pointer', color: 'white' }}
                 >
-                    <span className="relative z-10 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                        UPLOAD FILE
-                    </span>
+                    UPLOAD FILE
                 </button>
             </div>
             
-            <p className="mt-8 text-white/40 text-sm max-w-md text-center">
-                Select an audio source to begin. For System Audio, choose the tab sharing option in your browser.
+            <p className="mt-8 text-white/40 text-sm max-w-md text-center" style={{ marginTop: '2rem', color: '#aaa' }}>
+                Select an audio source to begin.
             </p>
         </div>
       )}
 
       {/* 5. UI Controls */}
-      <Controls 
-        sourceType={sourceType}
-        setSourceType={handleSourceChange}
-        visualMode={visualMode}
-        setVisualMode={setVisualMode}
-        performerName={performerName}
-        setPerformerName={setPerformerName}
-        additionalTexts={additionalTexts}
-        setAdditionalTexts={setAdditionalTexts}
-        sensitivity={sensitivity}
-        setSensitivity={setSensitivity}
-        onFileUpload={handleFileUpload}
-        toggleFullscreen={toggleFullscreen}
-        primaryColor={primaryColor}
-        setPrimaryColor={setPrimaryColor}
-        secondaryColor={secondaryColor}
-        setSecondaryColor={setSecondaryColor}
-        onManualRandomize={handleRandomizeAppearance}
-        isAutoRandomColor={isAutoRandomColor}
-        setIsAutoRandomColor={setIsAutoRandomColor}
-        isMonitoring={isMonitoring}
-        setIsMonitoring={setIsMonitoring}
-        isAutoCycle={isAutoCycle}
-        setIsAutoCycle={setIsAutoCycle}
-        cycleModes={cycleModes}
-        setCycleModes={setCycleModes}
-        isHighQuality={isHighQuality}
-        setIsHighQuality={setIsHighQuality}
-      />
+      <div style={{ position: 'relative', zIndex: 50 }}>
+          <Controls 
+            sourceType={sourceType}
+            setSourceType={handleSourceChange}
+            visualMode={visualMode}
+            setVisualMode={setVisualMode}
+            performerName={performerName}
+            setPerformerName={setPerformerName}
+            additionalTexts={additionalTexts}
+            setAdditionalTexts={setAdditionalTexts}
+            sensitivity={sensitivity}
+            setSensitivity={setSensitivity}
+            onFileUpload={handleFileUpload}
+            toggleFullscreen={toggleFullscreen}
+            primaryColor={primaryColor}
+            setPrimaryColor={setPrimaryColor}
+            secondaryColor={secondaryColor}
+            setSecondaryColor={setSecondaryColor}
+            onManualRandomize={handleRandomizeAppearance}
+            isAutoRandomColor={isAutoRandomColor}
+            setIsAutoRandomColor={setIsAutoRandomColor}
+            isMonitoring={isMonitoring}
+            setIsMonitoring={setIsMonitoring}
+            isAutoCycle={isAutoCycle}
+            setIsAutoCycle={setIsAutoCycle}
+            cycleModes={cycleModes}
+            setCycleModes={setCycleModes}
+            isHighQuality={isHighQuality}
+            setIsHighQuality={setIsHighQuality}
+          />
+      </div>
       
       {/* Watermark/Credit (Small) */}
-      <div className="fixed bottom-1 right-2 text-[10px] text-white/20 pointer-events-none z-0">
+      <div className="fixed bottom-1 right-2 text-[10px] text-white/20 pointer-events-none z-0" style={{ position: 'fixed', bottom: '4px', right: '8px', fontSize: '10px', color: 'rgba(255,255,255,0.2)' }}>
           GT2-PRISM 1.0 // 60FPS
       </div>
     </div>
