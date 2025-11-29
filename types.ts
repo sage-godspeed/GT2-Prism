@@ -1,4 +1,4 @@
-import React from 'react';
+import 'react';
 
 export enum AudioSourceType {
   MICROPHONE = 'MICROPHONE',
@@ -24,6 +24,32 @@ export interface AudioAnalysisData {
 }
 
 declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      mesh: any;
+      group: any;
+      instancedMesh: any;
+      primitive: any;
+      points: any;
+      ambientLight: any;
+      pointLight: any;
+      spotLight: any;
+      directionalLight: any;
+      boxGeometry: any;
+      planeGeometry: any;
+      icosahedronGeometry: any;
+      cylinderGeometry: any;
+      sphereGeometry: any;
+      meshStandardMaterial: any;
+      shaderMaterial: any;
+      pointsMaterial: any;
+      meshBasicMaterial: any;
+      [elemName: string]: any;
+    }
+  }
+}
+
+declare module 'react' {
   namespace JSX {
     interface IntrinsicElements {
       mesh: any;
