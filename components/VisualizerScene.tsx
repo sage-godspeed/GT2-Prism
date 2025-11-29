@@ -44,6 +44,7 @@ const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sen
 
   return (
     <>
+      <color attach="background" args={['#000000']} />
       <ambientLight intensity={0.2} />
       <pointLight position={[10, 10, 10]} intensity={1.5} color={color} />
       <pointLight position={[-10, -10, -10]} intensity={1.0} color="#ffffff" />
@@ -68,7 +69,7 @@ const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sen
           <FireRealm audioData={audioDataRef} color={color} />
       )}
 
-      <EffectComposer>
+      <EffectComposer disableNormalPass>
         <Bloom 
             luminanceThreshold={0.2} 
             mipmapBlur 
@@ -87,7 +88,13 @@ export const VisualizerScene: React.FC<VisualizerSceneProps> = (props) => {
     <div className="w-full h-full bg-black">
       <Canvas
         camera={{ position: [0, 0, 6], fov: 45 }}
-        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        gl={{ 
+          antialias: false, 
+          alpha: false, // Explicitly disable alpha for performance and to prevent transparent black background
+          powerPreference: 'default', // Relaxed from high-performance to prevent crashes on some mobile GPUs
+          stencil: false,
+          depth: true
+        }}
         dpr={[1, 2]} 
       >
         <Suspense fallback={null}>
