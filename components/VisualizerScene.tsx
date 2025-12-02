@@ -71,7 +71,7 @@ const SceneContent: React.FC<{ audioManager: AudioManager; mode: VisualMode; sen
       )}
 
       {/* Conditional post-processing: if High Quality is off, we reduce complexity */}
-      <EffectComposer disableNormalPass={true} multisampling={isHighQuality ? 4 : 0}>
+      <EffectComposer enableNormalPass={false} multisampling={isHighQuality ? 4 : 0}>
         <Bloom 
             luminanceThreshold={0.2} 
             mipmapBlur 
