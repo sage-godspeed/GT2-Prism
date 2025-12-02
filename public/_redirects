@@ -1,2 +1,1 @@
-# SPA fallback - redirect all requests to index.html
-/* /index.html 200
+# SPA routing is handled by worker.js
