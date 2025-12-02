@@ -1,0 +1,22 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- GT2-Prism themed favicon with geometric prism design -->
+  <rect width="32" height="32" fill="#000000"/>
+
+  <!-- Prism triangle with gradient effect -->
+  <defs>
+    <linearGradient id="prism-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ff00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffff00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main prism shape -->
+  <path d="M16 4 L28 24 L4 24 Z" fill="url(#prism-gradient)" opacity="0.8"/>
+
+  <!-- Inner geometric accent -->
+  <path d="M16 10 L22 20 L10 20 Z" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+
+  <!-- Center dot/point -->
+  <circle cx="16" cy="16" r="1.5" fill="#ffffff" opacity="0.9"/>
+</svg>
