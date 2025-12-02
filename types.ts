@@ -74,3 +74,21 @@ declare module 'react' {
     }
   }
 }
+
+export interface LibraryMessage {
+  id: string;
+  text: string;
+  createdAt: number;
+  selected: boolean;
+}
+
+export interface MessageLibrary {
+  version: number;
+  messages: LibraryMessage[];
+}
+
+export interface PerformerHistory {
+  version: number;
+  names: string[];
+  maxSize: number;
+}

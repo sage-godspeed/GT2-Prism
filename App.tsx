@@ -4,6 +4,8 @@ import { VisualizerScene } from './components/VisualizerScene';
 import { Controls } from './components/Controls';
 import { PerformerOverlay } from './components/PerformerOverlay';
 import { AudioSourceType, VisualMode } from './types';
+import { useMessageLibrary } from './hooks/useMessageLibrary';
+import { usePerformerHistory } from './hooks/usePerformerHistory';
 
 const FONTS = [
     '"Space Mono", monospace', 
@@ -42,6 +44,10 @@ function App() {
   // Audio Settings
   const [isMonitoring, setIsMonitoring] = useState<boolean>(false);
 
+  // Message Library and Performer History
+  const messageLibrary = useMessageLibrary();
+  const performerHistory = usePerformerHistory();
+
   // --- Service ---
   const audioManager = useMemo(() => new AudioManager(), []);
 
@@ -49,8 +55,9 @@ function App() {
   const overlayMessages = useMemo(() => {
     const list: string[] = [];
     if (performerName.trim()) list.push(performerName);
-    return [...list, ...additionalTexts];
-  }, [performerName, additionalTexts]);
+    const selectedFromLibrary = messageLibrary.getSelectedMessages();
+    return [...list, ...selectedFromLibrary, ...additionalTexts];
+  }, [performerName, additionalTexts, messageLibrary]);
 
   // --- Auto Cycle Logic ---
   useEffect(() => {
@@ -132,6 +139,16 @@ function App() {
     }
     return () => clearInterval(interval);
   }, [isAutoRandomColor, handleRandomizeAppearance]);
+
+  // Save performer name to history (debounced)
+  useEffect(() => {
+    if (performerName.trim()) {
+      const timeout = setTimeout(() => {
+        performerHistory.addPerformerName(performerName);
+      }, 1000); // Debounce to avoid saving every keystroke
+      return () => clearTimeout(timeout);
+    }
+  }, [performerName, performerHistory]);
 
   const handleSourceChange = async (type: AudioSourceType) => {
     try {
@@ -302,6 +319,8 @@ function App() {
             setCycleModes={setCycleModes}
             isHighQuality={isHighQuality}
             setIsHighQuality={setIsHighQuality}
+            messageLibrary={messageLibrary}
+            performerHistory={performerHistory}
           />
       </div>
       
