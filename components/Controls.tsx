@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { AudioSourceType, VisualMode } from '../types';
+import { useMessageLibrary } from '../hooks/useMessageLibrary';
+import { usePerformerHistory } from '../hooks/usePerformerHistory';
 
 interface ControlsProps {
   sourceType: AudioSourceType;
@@ -29,6 +31,8 @@ interface ControlsProps {
   setCycleModes: (modes: VisualMode[]) => void;
   isHighQuality: boolean;
   setIsHighQuality: (val: boolean) => void;
+  messageLibrary: ReturnType<typeof useMessageLibrary>;
+  performerHistory: ReturnType<typeof usePerformerHistory>;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -58,11 +62,15 @@ export const Controls: React.FC<ControlsProps> = ({
   cycleModes,
   setCycleModes,
   isHighQuality,
-  setIsHighQuality
+  setIsHighQuality,
+  messageLibrary,
+  performerHistory
 }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [inputText, setInputText] = useState('');
   const [isCycleConfigOpen, setIsCycleConfigOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'input' | 'library'>('input');
+  const [performerDropdownOpen, setPerformerDropdownOpen] = useState(false);
 
   const handleAddText = () => {
     if (inputText.trim()) {
@@ -306,60 +314,188 @@ export const Controls: React.FC<ControlsProps> = ({
           </div>
 
           {/* Performer Name */}
-          <div>
-             <label className="block text-xs text-gray-400 mb-1">PERFORMER NAME</label>
-             <input 
-               type="text" 
-               value={performerName}
-               onChange={(e) => setPerformerName(e.target.value)}
-               className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 focus:bg-white/10 transition-all placeholder-white/20"
-               placeholder="ENTER NAME..."
-             />
+          <div className="relative">
+            <label className="block text-xs text-gray-400 mb-1">PERFORMER NAME</label>
+
+            <div className="relative">
+              <input
+                type="text"
+                value={performerName}
+                onChange={(e) => setPerformerName(e.target.value)}
+                onFocus={() => setPerformerDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setPerformerDropdownOpen(false), 200)}
+                className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 focus:bg-white/10 transition-all placeholder-white/20"
+                placeholder="ENTER NAME..."
+              />
+
+              {/* History Dropdown */}
+              {performerDropdownOpen && performerHistory.history.names.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-black/95 border border-cyan-500/30 rounded-lg shadow-2xl max-h-40 overflow-y-auto custom-scrollbar">
+                  {performerHistory.history.names.map((name, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setPerformerName(name);
+                        setPerformerDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-white hover:bg-cyan-900/40 transition-colors border-b border-white/5 last:border-0"
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Additional Texts List Manager */}
+          {/* Messages with Tabs */}
           <div>
-            <label className="block text-xs text-gray-400 mb-1">ADDITIONAL MESSAGES</label>
-            
-            {/* Input Row */}
-            <div className="flex gap-2 mb-2">
-                <input 
+            {/* Tab Header */}
+            <div className="flex items-center gap-1 mb-2 bg-white/5 p-1 rounded-lg">
+              <button
+                onClick={() => setActiveTab('input')}
+                className={`flex-1 text-xs py-1.5 rounded transition-colors font-bold ${
+                  activeTab === 'input'
+                    ? 'bg-cyan-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                INPUT
+              </button>
+              <button
+                onClick={() => setActiveTab('library')}
+                className={`flex-1 text-xs py-1.5 rounded transition-colors font-bold ${
+                  activeTab === 'library'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                LIBRARY ({messageLibrary.library.messages.length})
+              </button>
+            </div>
+
+            {/* INPUT TAB */}
+            {activeTab === 'input' && (
+              <div className="space-y-2 animate-fade-in">
+                <label className="block text-xs text-gray-400">MANUAL MESSAGES</label>
+
+                {/* Input Row */}
+                <div className="flex gap-2">
+                  <input
                     type="text"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={handleKeyDown}
                     className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-cyan-500 focus:bg-white/10 placeholder-white/20"
                     placeholder="Type message..."
-                />
-                <button 
+                  />
+                  <button
                     onClick={handleAddText}
                     className="px-3 py-1.5 bg-cyan-900/40 hover:bg-cyan-700 border border-cyan-500/50 rounded text-xs font-bold text-cyan-100 transition-colors"
-                >
+                  >
                     ADD
-                </button>
-            </div>
+                  </button>
+                </div>
 
-            {/* List View */}
-            {additionalTexts.length > 0 && (
-                <div className="max-h-32 overflow-y-auto custom-scrollbar bg-white/5 rounded border border-white/10 p-1">
+                {/* Manual Messages List */}
+                {additionalTexts.length > 0 && (
+                  <div className="max-h-32 overflow-y-auto custom-scrollbar bg-white/5 rounded border border-white/10 p-1">
                     {additionalTexts.map((text, index) => (
-                        <div key={index} className="group flex justify-between items-center bg-black/40 mb-1 last:mb-0 p-2 rounded text-xs hover:bg-white/10 transition-colors">
-                            <span className="truncate pr-2">{text}</span>
-                            <button 
-                                onClick={() => handleRemoveText(index)}
-                                className="text-white/30 hover:text-red-400 transition-colors p-1"
-                                aria-label="Remove item"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                        </div>
+                      <div key={index} className="group flex justify-between items-center bg-black/40 mb-1 last:mb-0 p-2 rounded text-xs hover:bg-white/10 transition-colors">
+                        <span className="truncate pr-2">{text}</span>
+                        <button
+                          onClick={() => handleRemoveText(index)}
+                          className="text-white/30 hover:text-red-400 transition-colors p-1"
+                          aria-label="Remove item"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </div>
                     ))}
-                </div>
+                  </div>
+                )}
+
+                {additionalTexts.length === 0 && (
+                  <div className="text-xs text-white/20 italic text-center py-2 border border-white/5 rounded border-dashed">
+                    No manual messages added
+                  </div>
+                )}
+              </div>
             )}
-            {additionalTexts.length === 0 && (
-                <div className="text-xs text-white/20 italic text-center py-2 border border-white/5 rounded border-dashed">
-                    No extra messages added
+
+            {/* LIBRARY TAB */}
+            {activeTab === 'library' && (
+              <div className="space-y-2 animate-fade-in">
+                <div className="flex justify-between items-center">
+                  <label className="block text-xs text-gray-400">SAVED MESSAGES</label>
+                  <button
+                    onClick={() => {
+                      const text = prompt('Enter message to save:');
+                      if (text?.trim()) {
+                        messageLibrary.addMessage(text);
+                      }
+                    }}
+                    className="text-xs px-2 py-1 bg-purple-900/40 hover:bg-purple-700 border border-purple-500/50 rounded font-bold text-purple-100 transition-colors"
+                  >
+                    + NEW
+                  </button>
                 </div>
+
+                {/* Library Messages List with Checkboxes */}
+                {messageLibrary.library.messages.length > 0 ? (
+                  <div className="max-h-64 overflow-y-auto custom-scrollbar bg-white/5 rounded border border-white/10 p-1">
+                    {messageLibrary.library.messages.map((msg) => (
+                      <div
+                        key={msg.id}
+                        className="group flex items-center gap-2 bg-black/40 mb-1 last:mb-0 p-2 rounded text-xs hover:bg-white/10 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={msg.selected}
+                          onChange={() => messageLibrary.toggleMessageSelection(msg.id)}
+                          className="accent-purple-500 w-4 h-4 flex-shrink-0"
+                        />
+                        <span className="flex-1 truncate">{msg.text}</span>
+                        <button
+                          onClick={() => {
+                            if (confirm(`Delete "${msg.text}"?`)) {
+                              messageLibrary.removeMessage(msg.id);
+                            }
+                          }}
+                          className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 transition-all p-1"
+                          aria-label="Delete message"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-xs text-white/20 italic text-center py-4 border border-white/5 rounded border-dashed">
+                    No saved messages yet. Click "+ NEW" to add one.
+                  </div>
+                )}
+
+                {/* Info text */}
+                {messageLibrary.library.messages.some(m => m.selected) && (
+                  <p className="text-[10px] text-purple-300 mt-2">
+                    {messageLibrary.getSelectedMessages().length} message(s) selected for display
+                  </p>
+                )}
+
+                {/* localStorage unavailable warning */}
+                {!messageLibrary.isAvailable && (
+                  <div className="text-[10px] text-orange-400 p-2 bg-orange-900/20 rounded border border-orange-500/30 mt-2">
+                    ⚠️ Storage unavailable. Messages won't be saved.
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
